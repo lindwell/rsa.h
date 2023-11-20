@@ -3,7 +3,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
+#include <math.h>
 #include <primesieve.h>
 
 typedef struct{
@@ -23,6 +25,7 @@ uint16_t gcd(uint16_t a, uint32_t b);
 uint16_t get_prime(uint16_t min, uint16_t max);
 void init_rsa(Rsa_data* rsa);
 uint32_t modular_inverse(uint32_t phi, uint16_t e);
+uint32_t modular_power(char m, uint16_t e, uint32_t n);
 
 #endif // RSA_H_
 
@@ -47,9 +50,6 @@ uint16_t get_prime(uint16_t min, uint16_t max) {
     int rand_index = size + 1;
     while(rand_index > size)
         rand_index = rand() % (int)size + (int)min;
-//    for (int i=0; i<size; i++) {
-//        printf("%u\n", primes[i]);
-//    }
     uint16_t prime = primes[rand_index];
     printf("[PRIME_LOG]size = %u\n", size);
     printf("[PRIME_LOG]prime = %u, rand_index = %d\n", prime, rand_index);
@@ -76,9 +76,11 @@ uint32_t modular_inverse(uint32_t a, uint16_t b) {
     return d;
 }
 
+uint32_t modular_power(char m, uint16_t e, uint32_t n) {
+    return (uint32_t)pow(m, e) % n;
+}
 
-
-void init_rsa_pub(Rsa_data* rsa, uint16_t min, uint16_t max) {
+void init_rsa_pub(Rsa_data* rsa, uint16_t min, uint16_t max, bool is_verbose) {
 
     uint16_t p,q,e;
     uint32_t n;
@@ -99,15 +101,22 @@ void init_rsa_pub(Rsa_data* rsa, uint16_t min, uint16_t max) {
     rsa->phi = phi;
 }
 
-void init_rsa_priv(Rsa_data* rsa) {
+void init_rsa_priv(Rsa_data* rsa, bool is_verbose) {
     uint16_t e = rsa->e;
     uint32_t phi = rsa->phi;
     rsa->d = modular_inverse(phi, e);
 }
 
 void Rsa_encrypt(Rsa_data* rsa, char* m, int min, int max, bool is_verbose) {
-    init_rsa_pub(rsa, min, max);
-    init_rsa_priv(rsa);
+    memcpy(rsa->message, m, strlen(m));
+    init_rsa_pub(rsa, min, max, is_verbose);
+    init_rsa_priv(rsa, is_verbose);
+    char encrypted[100];
+    for (int i=0; i<strlen(m); i++) {
+        printf("%c\n", m[i]);
+        encrypted[i] = modular_power(m[i], rsa->e, rsa->n);
+    }
+    printf("encrypted message: %s\n", encrypted);
 }
 
 void Rsa_decrypt(Rsa_data* rsa, bool is_verbose);

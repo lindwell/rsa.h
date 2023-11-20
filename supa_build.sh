@@ -2,5 +2,5 @@
 #
 
 
-gcc -O3 -Wall -Wextra -o bin/main src/main.c -lprimesieve
+gcc -O3 -Wall -Wextra -o bin/main src/main.c -lprimesieve -lm
 

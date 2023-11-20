@@ -13,6 +13,7 @@ int main(void) {
 
     printf("Enter message.(Maximum string length is 100 bytes.)\nmessage>");
     fgets(message, 100, stdin);
+//    encrypted.message = message;
     printf("Original contents: %s",message);
 
     Rsa_encrypt(&encrypted, message, 100, 10000, true);
